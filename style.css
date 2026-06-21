@@ -1,0 +1,124 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #f5f1ff;
+  background:
+    radial-gradient(circle at top, rgba(132, 67, 255, 0.35), transparent 35%),
+    linear-gradient(135deg, #0e0918, #1a1029 55%, #08070d);
+  min-height: 100vh;
+}
+
+.app {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  padding: 28px;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.panel {
+  position: sticky;
+  top: 24px;
+  padding: 24px;
+  border: 1px solid rgba(255, 220, 128, 0.35);
+  border-radius: 20px;
+  background: rgba(14, 9, 24, 0.82);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
+}
+
+h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+}
+
+.lead {
+  margin: 0 0 22px;
+  color: #d9cef5;
+  line-height: 1.7;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0;
+  font-weight: 700;
+}
+
+.field b {
+  margin-left: 6px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: #170e24;
+  background: #ffd96a;
+  font-size: 12px;
+}
+
+input[type="text"],
+input[type="file"] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 12px;
+  color: #fff;
+  background: rgba(255,255,255,0.08);
+}
+
+.buttons {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+button {
+  border: 0;
+  border-radius: 14px;
+  padding: 13px 16px;
+  font-weight: 800;
+  color: #1c122c;
+  background: linear-gradient(135deg, #ffe18a, #b78926);
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.status,
+.note {
+  line-height: 1.7;
+  color: #d9cef5;
+  font-size: 14px;
+}
+
+.preview {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+}
+
+canvas {
+  width: min(100%, 560px);
+  height: auto;
+  border-radius: 18px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.55);
+  background: #1a1029;
+}
+
+@media (max-width: 900px) {
+  .app {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .panel {
+    position: static;
+  }
+}

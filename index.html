@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AIカード診断</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="app">
+    <section class="panel">
+      <h1>AIカード診断</h1>
+      <p class="lead">名前と画像から、カードゲーム風の診断カードを生成します。</p>
+
+      <label class="field">
+        <span>名前 <b>必須</b></span>
+        <input id="userName" type="text" maxlength="18" placeholder="例：KiwiMaster" />
+      </label>
+
+      <label class="field">
+        <span>画像 <b>必須</b></span>
+        <input id="imageInput" type="file" accept="image/*" />
+      </label>
+
+      <div class="buttons">
+        <button id="generateBtn">カードを生成する</button>
+        <button id="downloadBtn" disabled>画像を保存</button>
+        <button id="shareBtn" disabled>Xで共有</button>
+      </div>
+
+      <p id="status" class="status">まずは名前と画像を入力してください。</p>
+      <p class="note">※X共有では画像の自動添付はできないため、保存した画像を投稿画面で添付してください。</p>
+    </section>
+
+    <section class="preview">
+      <canvas id="cardCanvas" width="1024" height="1440"></canvas>
+    </section>
+  </main>
+
+  <script src="./main.js"></script>
+</body>
+</html>
