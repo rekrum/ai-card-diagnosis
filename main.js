@@ -109,7 +109,7 @@ function normalizeCardData(data) {
     action2Name: String(data.action2Name || "アクション").slice(0, 10),
     action2Power: clamp(Number(data.action2Power || 70), 30, 120),
     action2Text: String(data.action2Text || "").slice(0, 38),
-    flavorText: String(data.flavorText || "").slice(0, 58),
+    flavorText: String(data.flavorText || "").slice(0, 34),
     cardNo: String(data.cardNo || "0001").replace(/\D/g, "").padStart(4, "0").slice(0, 4)
   };
 }
@@ -164,6 +164,7 @@ function drawHeader(data, userName) {
   ctx.textBaseline = "middle";
   ctx.fillText(data.rarity, 135, 128);
 
+  // HPは右側に固定
   ctx.fillStyle = "#fff";
   ctx.textAlign = "right";
   ctx.font = "bold 34px sans-serif";
@@ -171,9 +172,12 @@ function drawHeader(data, userName) {
   ctx.font = "bold 76px sans-serif";
   ctx.fillText(String(data.hp), 948, 126);
 
+  // 二つ名とユーザー名を2行に分け、長い名前でも崩れにくくする
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
-  fitText(`＜${data.title}＞${userName}`, 240, 128, 500, 40, 24);
+  ctx.fillStyle = "#fff";
+  fitText(`＜${data.title}＞`, 240, 108, 500, 34, 22);
+  fitText(userName, 240, 152, 500, 34, 22);
 }
 
 function drawImageArea(image, theme) {
@@ -272,29 +276,31 @@ function drawActionRow(y, name, text, power, theme) {
 }
 
 function drawFooter(data, theme) {
-  // ②の画像に合わせて、下部をテキスト左・No右のシンプル構成にする
-  const x = 62, y = 1350, w = 900;
+  // フレーバーテキストとカード番号を分離。星マークは表示しない。
+  const x = 62;
+  const y = 1350;
+  const w = 900;
 
   ctx.strokeStyle = theme.sub;
   ctx.lineWidth = 3;
   ctx.setLineDash([3, 7]);
   ctx.beginPath();
   ctx.moveTo(x, y - 34);
-  ctx.lineTo(x + 790, y - 34);
+  ctx.lineTo(x + w, y - 34);
   ctx.stroke();
   ctx.setLineDash([]);
 
   ctx.fillStyle = "#f1e9ff";
-  ctx.font = "21px sans-serif";
+  ctx.font = "20px sans-serif";
   ctx.textAlign = "left";
-  ctx.textBaseline = "alphabetic";
-  wrapText(data.flavorText, 78, y + 2, 640, 30, 2);
+  ctx.textBaseline = "middle";
+  fitText(data.flavorText, x + 18, y + 2, 540, 20, 14);
 
   ctx.fillStyle = "#f7e28d";
-  ctx.font = "bold 22px sans-serif";
+  ctx.font = "bold 18px sans-serif";
   ctx.textAlign = "right";
-  ctx.textBaseline = "alphabetic";
-  ctx.fillText(`No.${data.cardNo}`, x + w - 24, y + 2);
+  ctx.textBaseline = "middle";
+  ctx.fillText(`No.${data.cardNo}`, x + w - 10, y + 2);
 }
 
 function drawSparkles(x, y, w, h, theme) {
