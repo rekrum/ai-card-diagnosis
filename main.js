@@ -16,11 +16,11 @@ const themes = {
   "炎": { main: "#b82020", sub: "#ff8a1d", glow: "#ffd36a", dark: "#210707" },
   "水": { main: "#1565c0", sub: "#4fc3f7", glow: "#d9f6ff", dark: "#061420" },
   "草": { main: "#2e7d32", sub: "#8bc34a", glow: "#e8ffd6", dark: "#071b0c" },
-  "風": { main: "#7fbf9f", sub: "#e6fff2", glow: "#ffffff", dark: "#0a1c18" },
+  "風": { main: "#477a64", sub: "#83c7a5", glow: "#eefcf3", dark: "#0a1c18" },
   "雷": { main: "#f9a825", sub: "#fff176", glow: "#fffde7", dark: "#221806" },
-  "氷": { main: "#80deea", sub: "#e0f7fa", glow: "#ffffff", dark: "#081b20" },
+  "氷": { main: "#5fb8c9", sub: "#d8fbff", glow: "#ffffff", dark: "#081b20" },
   "闇": { main: "#2a1245", sub: "#7e3ff2", glow: "#d1b3ff", dark: "#090511" },
-  "光": { main: "#f5d76e", sub: "#ffffff", glow: "#fff7c2", dark: "#211b08" },
+  "光": { main: "#d5af35", sub: "#ffffff", glow: "#fff7c2", dark: "#211b08" },
   "地": { main: "#795548", sub: "#c49a6c", glow: "#ffe0b2", dark: "#1f140d" },
   "竜": { main: "#5b0f0f", sub: "#111111", glow: "#ffcc80", dark: "#160606" }
 };
@@ -102,14 +102,14 @@ function normalizeCardData(data) {
     type: allowedTypes.includes(data.type) ? data.type : "闇",
     totalPower: clamp(Number(data.totalPower || 238), 150, 300),
     specialName: String(data.specialName || "特殊効果").slice(0, 10),
-    specialEffect: String(data.specialEffect || "").slice(0, 54),
+    specialEffect: String(data.specialEffect || "").slice(0, 58),
     action1Name: String(data.action1Name || "アクション").slice(0, 10),
     action1Power: clamp(Number(data.action1Power || 70), 30, 120),
-    action1Text: String(data.action1Text || "").slice(0, 34),
+    action1Text: String(data.action1Text || "").slice(0, 38),
     action2Name: String(data.action2Name || "アクション").slice(0, 10),
     action2Power: clamp(Number(data.action2Power || 70), 30, 120),
-    action2Text: String(data.action2Text || "").slice(0, 34),
-    flavorText: String(data.flavorText || "").slice(0, 44),
+    action2Text: String(data.action2Text || "").slice(0, 38),
+    flavorText: String(data.flavorText || "").slice(0, 58),
     cardNo: String(data.cardNo || "0001").replace(/\D/g, "").padStart(4, "0").slice(0, 4)
   };
 }
@@ -128,7 +128,7 @@ function drawCard(data, userName, image) {
   drawGoldFrame(24, 24, W - 48, H - 48);
   drawCardBody(theme);
 
-  drawHeader(data, userName, theme);
+  drawHeader(data, userName);
   drawImageArea(image, theme);
   drawInfoArea(data, theme);
   drawActions(data, theme);
@@ -138,51 +138,49 @@ function drawCard(data, userName, image) {
 function drawGoldFrame(x, y, w, h) {
   const grad = ctx.createLinearGradient(x, y, x + w, y + h);
   grad.addColorStop(0, "#fff0a6");
-  grad.addColorStop(0.2, "#b8892e");
-  grad.addColorStop(0.45, "#fff4b8");
-  grad.addColorStop(0.7, "#8d641d");
+  grad.addColorStop(0.18, "#b8892e");
+  grad.addColorStop(0.44, "#fff4b8");
+  grad.addColorStop(0.72, "#8d641d");
   grad.addColorStop(1, "#ffe899");
   drawRoundedRect(x, y, w, h, 30, grad);
   drawRoundedRect(x + 26, y + 26, w - 52, h - 52, 22, "#150d21");
 }
 
 function drawCardBody(theme) {
-  const grad = ctx.createLinearGradient(50, 60, 970, 1380);
+  const grad = ctx.createLinearGradient(48, 48, 976, 1392);
   grad.addColorStop(0, theme.dark);
-  grad.addColorStop(0.45, theme.main);
+  grad.addColorStop(0.48, theme.main);
   grad.addColorStop(1, "#100a18");
   drawRoundedRect(48, 48, 928, 1344, 22, grad);
 }
 
 function drawHeader(data, userName) {
-  drawRoundedRect(66, 58, 132, 132, 18, "#0d0a10");
-  strokeRoundedRect(66, 58, 132, 132, 18, "#f2d073", 5);
+  drawRoundedRect(62, 54, 146, 146, 16, "#0c0711");
+  strokeRoundedRect(62, 54, 146, 146, 16, "#f2d073", 5);
 
   ctx.fillStyle = "#f7e28d";
-  ctx.font = "bold 72px serif";
+  ctx.font = "bold 76px serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(data.rarity, 132, 126);
+  ctx.fillText(data.rarity, 135, 128);
 
-  // HP領域を右側に固定し、名前と重ならないようにする
   ctx.fillStyle = "#fff";
   ctx.textAlign = "right";
   ctx.font = "bold 34px sans-serif";
-  ctx.fillText("HP", 800, 124);
-  ctx.font = "bold 72px sans-serif";
-  ctx.fillText(String(data.hp), 945, 120);
+  ctx.fillText("HP", 812, 128);
+  ctx.font = "bold 76px sans-serif";
+  ctx.fillText(String(data.hp), 948, 126);
 
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
-  ctx.fillStyle = "#fff";
-  fitText(`＜${data.title}＞${userName}`, 220, 122, 520, 40, 24);
+  fitText(`＜${data.title}＞${userName}`, 240, 128, 500, 40, 24);
 }
 
 function drawImageArea(image, theme) {
-  const x = 62, y = 205, w = 900, h = 580;
-  const grad = ctx.createRadialGradient(x + w / 2, y + h * 0.72, 10, x + w / 2, y + h / 2, w * 0.78);
+  const x = 62, y = 214, w = 900, h = 590;
+  const grad = ctx.createRadialGradient(x + w / 2, y + h * 0.72, 16, x + w / 2, y + h / 2, w * 0.78);
   grad.addColorStop(0, theme.glow);
-  grad.addColorStop(0.26, theme.sub);
+  grad.addColorStop(0.27, theme.sub);
   grad.addColorStop(0.66, theme.main);
   grad.addColorStop(1, theme.dark);
   ctx.fillStyle = grad;
@@ -191,7 +189,7 @@ function drawImageArea(image, theme) {
   drawSparkles(x, y, w, h, theme);
 
   if (image) {
-    drawContainedImage(image, x + 42, y + 38, w - 84, h - 76);
+    drawContainedImage(image, x + 40, y + 36, w - 80, h - 72);
   } else {
     ctx.fillStyle = "rgba(255,255,255,0.66)";
     ctx.font = "bold 44px sans-serif";
@@ -206,91 +204,97 @@ function drawImageArea(image, theme) {
 }
 
 function drawInfoArea(data, theme) {
-  const y = 812;
+  const y = 832;
 
-  drawRoundedRect(62, y, 214, 194, 0, "rgba(8,5,15,0.76)");
+  drawRoundedRect(62, y, 234, 202, 0, "rgba(8,5,15,0.78)");
+  strokeRoundedRect(62, y, 234, 202, 0, "rgba(126,63,242,0.35)", 1);
   ctx.fillStyle = "#f5d76e";
   ctx.font = "bold 34px sans-serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
-  ctx.fillText("総合力", 169, y + 58);
+  ctx.fillText("総合力", 179, y + 62);
   ctx.font = "bold 88px serif";
-  ctx.fillText(String(data.totalPower), 169, y + 142);
+  ctx.fillText(String(data.totalPower), 179, y + 154);
 
-  drawRoundedRect(302, y + 14, 630, 166, 12, "rgba(12,7,20,0.84)");
-  strokeRoundedRect(302, y + 14, 630, 166, 12, theme.sub, 2);
+  drawRoundedRect(318, y + 4, 642, 196, 12, "rgba(12,7,20,0.84)");
+  strokeRoundedRect(318, y + 4, 642, 196, 12, theme.sub, 2);
+
   ctx.fillStyle = theme.sub;
   ctx.font = "bold 26px sans-serif";
   ctx.textAlign = "left";
-  ctx.fillText("特殊効果", 326, y + 48);
+  ctx.fillText("特殊効果", 344, y + 46);
 
   ctx.fillStyle = "#fff";
   ctx.font = "bold 40px sans-serif";
-  ctx.fillText(data.specialName, 326, y + 92);
+  ctx.fillText(data.specialName, 344, y + 94);
   ctx.font = "26px sans-serif";
-  wrapText(data.specialEffect, 326, y + 126, 560, 34, 2);
+  wrapText(data.specialEffect, 344, y + 130, 570, 34, 2);
 }
 
 function drawActions(data, theme) {
-  drawActionRow(1026, data.action1Name, data.action1Text, data.action1Power, theme);
-  drawActionRow(1168, data.action2Name, data.action2Text, data.action2Power, theme);
+  drawActionRow(1056, data.action1Name, data.action1Text, data.action1Power, theme);
+  drawActionRow(1208, data.action2Name, data.action2Text, data.action2Power, theme);
 }
 
 function drawActionRow(y, name, text, power, theme) {
-  const x = 62, w = 900, h = 126;
-  ctx.fillStyle = "rgba(255, 238, 246, 0.9)";
+  const x = 62, w = 900, h = 130;
+  ctx.fillStyle = "rgba(255, 238, 246, 0.92)";
   ctx.fillRect(x, y, w, h);
 
   ctx.beginPath();
-  ctx.arc(118, y + 63, 38, 0, Math.PI * 2);
-  ctx.fillStyle = theme.main;
+  ctx.arc(120, y + 65, 39, 0, Math.PI * 2);
+  ctx.fillStyle = theme.dark;
   ctx.fill();
-  ctx.strokeStyle = "#e9d084";
+  ctx.strokeStyle = "#e6c754";
   ctx.lineWidth = 4;
   ctx.stroke();
 
-  ctx.fillStyle = "#1b1422";
+  ctx.fillStyle = "#160f1d";
   ctx.textAlign = "left";
   ctx.textBaseline = "alphabetic";
-  fitText(name, 220, y + 48, 540, 36, 24);
+  fitText(name, 220, y + 48, 540, 38, 24);
 
   ctx.strokeStyle = "#2b2030";
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(220, y + 58);
-  ctx.lineTo(810, y + 58);
+  ctx.lineTo(812, y + 58);
   ctx.stroke();
 
-  ctx.fillStyle = "#19121f";
-  ctx.font = "23px sans-serif";
-  wrapText(text, 220, y + 90, 560, 28, 1);
+  ctx.fillStyle = "#1a1320";
+  ctx.font = "24px sans-serif";
+  fitText(text, 220, y + 91, 590, 24, 18);
 
   ctx.fillStyle = "#070507";
   ctx.font = "bold 58px sans-serif";
   ctx.textAlign = "right";
-  ctx.fillText(String(power), 920, y + 78);
+  ctx.fillText(String(power), 922, y + 84);
 }
 
-function drawFooter(data) {
-  // フレーバーテキストとカード番号を左右で完全に分離
-  const x = 62, y = 1316, w = 900, h = 68;
-  ctx.fillStyle = "rgba(20, 10, 32, 0.96)";
-  ctx.fillRect(x, y, w, h);
+function drawFooter(data, theme) {
+  // ②の画像に合わせて、下部をテキスト左・No右のシンプル構成にする
+  const x = 62, y = 1350, w = 900;
+
+  ctx.strokeStyle = theme.sub;
+  ctx.lineWidth = 3;
+  ctx.setLineDash([3, 7]);
+  ctx.beginPath();
+  ctx.moveTo(x, y - 34);
+  ctx.lineTo(x + 790, y - 34);
+  ctx.stroke();
+  ctx.setLineDash([]);
 
   ctx.fillStyle = "#f1e9ff";
-  ctx.font = "22px sans-serif";
+  ctx.font = "21px sans-serif";
   ctx.textAlign = "left";
-  ctx.textBaseline = "middle";
-  // カード番号欄を右側に確保するため、本文幅を短めに固定
-  fitText(data.flavorText, 84, y + 35, 560, 22, 16);
+  ctx.textBaseline = "alphabetic";
+  wrapText(data.flavorText, 78, y + 2, 640, 30, 2);
 
   ctx.fillStyle = "#f7e28d";
-  ctx.font = "bold 28px sans-serif";
+  ctx.font = "bold 22px sans-serif";
   ctx.textAlign = "right";
   ctx.textBaseline = "alphabetic";
-  ctx.fillText(`No.${data.cardNo}`, 850, y + 45);
-  ctx.font = "42px serif";
-  ctx.fillText("☆", 930, y + 47);
+  ctx.fillText(`No.${data.cardNo}`, x + w - 24, y + 2);
 }
 
 function drawSparkles(x, y, w, h, theme) {
