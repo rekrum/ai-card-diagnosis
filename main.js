@@ -27,7 +27,7 @@ const themes = {
 
 const fallbackData = {
   rarity: "SR",
-  title: "紫髪のキーウィ",
+  title: "???",
   hp: 120,
   type: "闇",
   totalPower: 238,
@@ -72,7 +72,7 @@ async function generateCard() {
   } catch (err) {
     console.error(err);
     statusEl.textContent = "AI診断に失敗したため、サンプル診断で生成しました。API設定を確認してください。";
-    latestCardData = fallbackData;
+    latestCardData = normalizeCardData(fallbackData);
     drawCard(latestCardData, userName, latestImage);
     downloadBtn.disabled = false;
     shareBtn.disabled = false;
@@ -86,15 +86,8 @@ async function callDiagnoseApi(userName, file) {
   formData.append("userName", userName);
   formData.append("image", file);
 
-  const response = await fetch(API_ENDPOINT, {
-    method: "POST",
-    body: formData
-  });
-
-  if (!response.ok) {
-    throw new Error(`API error: ${response.status}`);
-  }
-
+  const response = await fetch(API_ENDPOINT, { method: "POST", body: formData });
+  if (!response.ok) throw new Error(`API error: ${response.status}`);
   return await response.json();
 }
 
@@ -104,25 +97,25 @@ function normalizeCardData(data) {
 
   return {
     rarity: allowedRarities.includes(data.rarity) ? data.rarity : "SR",
-    title: String(data.title || "未知なる存在").slice(0, 14),
+    title: String(data.title || "???").slice(0, 12),
     hp: clamp(Number(data.hp || 120), 80, 180),
     type: allowedTypes.includes(data.type) ? data.type : "闇",
     totalPower: clamp(Number(data.totalPower || 238), 150, 300),
-    specialName: String(data.specialName || "特殊効果").slice(0, 12),
-    specialEffect: String(data.specialEffect || "").slice(0, 80),
-    action1Name: String(data.action1Name || "アクション").slice(0, 14),
+    specialName: String(data.specialName || "特殊効果").slice(0, 10),
+    specialEffect: String(data.specialEffect || "").slice(0, 62),
+    action1Name: String(data.action1Name || "アクション").slice(0, 10),
     action1Power: clamp(Number(data.action1Power || 70), 30, 120),
-    action1Text: String(data.action1Text || "").slice(0, 50),
-    action2Name: String(data.action2Name || "アクション").slice(0, 14),
+    action1Text: String(data.action1Text || "").slice(0, 40),
+    action2Name: String(data.action2Name || "アクション").slice(0, 10),
     action2Power: clamp(Number(data.action2Power || 70), 30, 120),
-    action2Text: String(data.action2Text || "").slice(0, 50),
-    flavorText: String(data.flavorText || "").slice(0, 80),
+    action2Text: String(data.action2Text || "").slice(0, 40),
+    flavorText: String(data.flavorText || "").slice(0, 54),
     cardNo: String(data.cardNo || "0001").replace(/\D/g, "").padStart(4, "0").slice(0, 4)
   };
 }
 
 function drawEmptyCard() {
-  drawCard(fallbackData, "KiwiMaster", null);
+  drawCard(normalizeCardData(fallbackData), "名前", null);
 }
 
 function drawCard(data, userName, image) {
@@ -161,33 +154,36 @@ function drawCardBody(theme) {
   drawRoundedRect(48, 48, 928, 1344, 22, grad);
 }
 
-function drawHeader(data, userName, theme) {
+function drawHeader(data, userName) {
   drawRoundedRect(66, 58, 132, 132, 18, "#0d0a10");
   strokeRoundedRect(66, 58, 132, 132, 18, "#f2d073", 5);
+
   ctx.fillStyle = "#f7e28d";
   ctx.font = "bold 72px serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(data.rarity, 132, 126);
 
+  // HP領域を右側に固定し、名前と重ならないようにする
   ctx.fillStyle = "#fff";
-  ctx.font = "bold 40px sans-serif";
-  ctx.textAlign = "left";
-  fitText(`＜${data.title}＞${userName}`, 220, 122, 560, 40);
-
-  ctx.font = "bold 36px sans-serif";
   ctx.textAlign = "right";
-  ctx.fillText(`HP`, 812, 124);
+  ctx.font = "bold 34px sans-serif";
+  ctx.fillText("HP", 800, 124);
   ctx.font = "bold 72px sans-serif";
   ctx.fillText(String(data.hp), 945, 120);
+
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = "#fff";
+  fitText(`＜${data.title}＞${userName}`, 220, 122, 520, 40, 24);
 }
 
 function drawImageArea(image, theme) {
   const x = 62, y = 205, w = 900, h = 580;
-  const grad = ctx.createRadialGradient(x + w / 2, y + h * 0.75, 10, x + w / 2, y + h / 2, w * 0.8);
+  const grad = ctx.createRadialGradient(x + w / 2, y + h * 0.72, 10, x + w / 2, y + h / 2, w * 0.78);
   grad.addColorStop(0, theme.glow);
-  grad.addColorStop(0.25, theme.sub);
-  grad.addColorStop(0.65, theme.main);
+  grad.addColorStop(0.26, theme.sub);
+  grad.addColorStop(0.66, theme.main);
   grad.addColorStop(1, theme.dark);
   ctx.fillStyle = grad;
   ctx.fillRect(x, y, w, h);
@@ -195,11 +191,12 @@ function drawImageArea(image, theme) {
   drawSparkles(x, y, w, h, theme);
 
   if (image) {
-    drawContainedImage(image, x + 52, y + 42, w - 104, h - 84);
+    drawContainedImage(image, x + 42, y + 38, w - 84, h - 76);
   } else {
-    ctx.fillStyle = "rgba(255,255,255,0.65)";
+    ctx.fillStyle = "rgba(255,255,255,0.66)";
     ctx.font = "bold 44px sans-serif";
     ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
     ctx.fillText("画像プレビュー", x + w / 2, y + h / 2);
   }
 
@@ -210,15 +207,17 @@ function drawImageArea(image, theme) {
 
 function drawInfoArea(data, theme) {
   const y = 812;
-  drawRoundedRect(62, y, 214, 194, 0, "rgba(8,5,15,0.75)");
+
+  drawRoundedRect(62, y, 214, 194, 0, "rgba(8,5,15,0.76)");
   ctx.fillStyle = "#f5d76e";
   ctx.font = "bold 34px sans-serif";
   ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
   ctx.fillText("総合力", 169, y + 58);
   ctx.font = "bold 88px serif";
   ctx.fillText(String(data.totalPower), 169, y + 142);
 
-  drawRoundedRect(302, y + 14, 630, 166, 12, "rgba(12,7,20,0.82)");
+  drawRoundedRect(302, y + 14, 630, 166, 12, "rgba(12,7,20,0.84)");
   strokeRoundedRect(302, y + 14, 630, 166, 12, theme.sub, 2);
   ctx.fillStyle = theme.sub;
   ctx.font = "bold 26px sans-serif";
@@ -227,74 +226,69 @@ function drawInfoArea(data, theme) {
 
   ctx.fillStyle = "#fff";
   ctx.font = "bold 40px sans-serif";
-  ctx.fillText(data.specialName, 326, y + 94);
+  ctx.fillText(data.specialName, 326, y + 92);
   ctx.font = "26px sans-serif";
-  wrapText(data.specialEffect, 326, y + 130, 560, 34, 2);
+  wrapText(data.specialEffect, 326, y + 126, 560, 34, 2);
 }
 
 function drawActions(data, theme) {
-  const y1 = 1030;
-  const y2 = 1210;
-  drawActionRow(y1, data.action1Name, data.action1Text, data.action1Power, theme, true);
-  drawActionRow(y2, data.action2Name, data.action2Text, data.action2Power, theme, false);
+  drawActionRow(1036, data.action1Name, data.action1Text, data.action1Power, theme);
+  drawActionRow(1204, data.action2Name, data.action2Text, data.action2Power, theme);
 }
 
-function drawActionRow(y, name, text, power, theme, line) {
-  ctx.fillStyle = "rgba(255, 238, 246, 0.88)";
-  ctx.fillRect(62, y - 22, 900, 160);
+function drawActionRow(y, name, text, power, theme) {
+  const x = 62, w = 900, h = 146;
+  ctx.fillStyle = "rgba(255, 238, 246, 0.9)";
+  ctx.fillRect(x, y, w, h);
 
   ctx.beginPath();
-  ctx.arc(118, y + 52, 44, 0, Math.PI * 2);
+  ctx.arc(118, y + 73, 42, 0, Math.PI * 2);
   ctx.fillStyle = theme.main;
   ctx.fill();
   ctx.strokeStyle = "#e9d084";
   ctx.lineWidth = 4;
   ctx.stroke();
 
-  ctx.fillStyle = "#fff";
-  ctx.font = "bold 44px sans-serif";
+  ctx.fillStyle = "#1b1422";
   ctx.textAlign = "left";
-  ctx.fillText(name, 220, y + 26);
+  ctx.textBaseline = "alphabetic";
+  fitText(name, 220, y + 54, 540, 40, 26);
 
-  ctx.strokeStyle = "#261d2c";
+  ctx.strokeStyle = "#2b2030";
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(220, y + 42);
-  ctx.lineTo(810, y + 42);
+  ctx.moveTo(220, y + 66);
+  ctx.lineTo(810, y + 66);
   ctx.stroke();
 
   ctx.fillStyle = "#19121f";
-  ctx.font = "26px sans-serif";
-  wrapText(text, 220, y + 78, 590, 34, 2);
+  ctx.font = "25px sans-serif";
+  wrapText(text, 220, y + 98, 560, 32, 2);
 
   ctx.fillStyle = "#070507";
-  ctx.font = "bold 64px sans-serif";
+  ctx.font = "bold 62px sans-serif";
   ctx.textAlign = "right";
-  ctx.fillText(String(power), 920, y + 62);
-
-  if (line) {
-    ctx.strokeStyle = "rgba(32, 21, 38, 0.6)";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(80, y + 150);
-    ctx.lineTo(940, y + 150);
-    ctx.stroke();
-  }
+  ctx.fillText(String(power), 920, y + 88);
 }
 
-function drawFooter(data, theme) {
-  drawRoundedRect(62, 1362 - 130, 900, 130, 0, "rgba(20, 10, 32, 0.92)");
+function drawFooter(data) {
+  // フッターをアクション2より下に固定し、重なりを防ぐ
+  const x = 62, y = 1360, w = 900, h = 82;
+  ctx.fillStyle = "rgba(20, 10, 32, 0.94)";
+  ctx.fillRect(x, y - h, w, h);
+
   ctx.fillStyle = "#f1e9ff";
-  ctx.font = "25px sans-serif";
+  ctx.font = "24px sans-serif";
   ctx.textAlign = "left";
-  wrapText(data.flavorText, 84, 1286, 720, 36, 2);
+  ctx.textBaseline = "alphabetic";
+  wrapText(data.flavorText, 84, y - 44, 650, 30, 2);
 
   ctx.fillStyle = "#f7e28d";
   ctx.font = "bold 28px sans-serif";
   ctx.textAlign = "right";
-  ctx.fillText(`No.${data.cardNo}`, 850, 1350);
+  ctx.fillText(`No.${data.cardNo}`, 850, y - 22);
   ctx.font = "42px serif";
-  ctx.fillText("☆", 930, 1352);
+  ctx.fillText("☆", 930, y - 20);
 }
 
 function drawSparkles(x, y, w, h, theme) {
@@ -372,20 +366,20 @@ function strokeRoundedRect(x, y, w, h, r, color, lineWidth) {
   ctx.stroke();
 }
 
-function fitText(text, x, y, maxWidth, fontSize) {
+function fitText(text, x, y, maxWidth, fontSize, minSize = 20) {
   let size = fontSize;
   do {
     ctx.font = `bold ${size}px sans-serif`;
     if (ctx.measureText(text).width <= maxWidth) break;
     size -= 2;
-  } while (size >= 22);
+  } while (size >= minSize);
   ctx.fillText(text, x, y);
 }
 
 function wrapText(text, x, y, maxWidth, lineHeight, maxLines) {
   const chars = Array.from(text);
   let line = "";
-  let lines = [];
+  const lines = [];
 
   for (const ch of chars) {
     const testLine = line + ch;
