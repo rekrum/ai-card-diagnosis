@@ -272,16 +272,17 @@ function drawActionRow(y, name, text, power, theme) {
 }
 
 function drawFooter(data) {
-  // アクション2の下に独立したフッター帯を配置
+  // フレーバーテキストとカード番号を左右で完全に分離
   const x = 62, y = 1316, w = 900, h = 68;
   ctx.fillStyle = "rgba(20, 10, 32, 0.96)";
   ctx.fillRect(x, y, w, h);
 
   ctx.fillStyle = "#f1e9ff";
-  ctx.font = "23px sans-serif";
+  ctx.font = "22px sans-serif";
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
-  fitText(data.flavorText, 84, y + 35, 620, 23, 18);
+  // カード番号欄を右側に確保するため、本文幅を短めに固定
+  fitText(data.flavorText, 84, y + 35, 560, 22, 16);
 
   ctx.fillStyle = "#f7e28d";
   ctx.font = "bold 28px sans-serif";
