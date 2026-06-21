@@ -102,13 +102,13 @@ function normalizeCardData(data) {
     type: allowedTypes.includes(data.type) ? data.type : "闇",
     totalPower: clamp(Number(data.totalPower || 238), 150, 300),
     specialName: String(data.specialName || "特殊効果").slice(0, 10),
-    specialEffect: String(data.specialEffect || "").slice(0, 58),
+    specialEffect: String(data.specialEffect || "").slice(0, 52),
     action1Name: String(data.action1Name || "アクション").slice(0, 10),
     action1Power: clamp(Number(data.action1Power || 70), 30, 120),
-    action1Text: String(data.action1Text || "").slice(0, 38),
+    action1Text: String(data.action1Text || "").slice(0, 34),
     action2Name: String(data.action2Name || "アクション").slice(0, 10),
     action2Power: clamp(Number(data.action2Power || 70), 30, 120),
-    action2Text: String(data.action2Text || "").slice(0, 38),
+    action2Text: String(data.action2Text || "").slice(0, 34),
     flavorText: String(data.flavorText || "").slice(0, 34),
     cardNo: String(data.cardNo || "0001").replace(/\D/g, "").padStart(4, "0").slice(0, 4)
   };
@@ -226,13 +226,16 @@ function drawInfoArea(data, theme) {
   ctx.fillStyle = theme.sub;
   ctx.font = "bold 26px sans-serif";
   ctx.textAlign = "left";
-  ctx.fillText("特殊効果", 344, y + 46);
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText("特殊効果", 344, y + 44);
 
   ctx.fillStyle = "#fff";
-  ctx.font = "bold 40px sans-serif";
-  ctx.fillText(data.specialName, 344, y + 94);
-  ctx.font = "26px sans-serif";
-  wrapText(data.specialEffect, 344, y + 130, 570, 34, 2);
+  fitText(data.specialName, 344, y + 90, 560, 38, 26);
+
+  // 効果説明は必ず2行以内に収める
+  ctx.fillStyle = "#fff";
+  ctx.font = "24px sans-serif";
+  drawWrappedText(data.specialEffect, 344, y + 124, 570, 32, 2);
 }
 
 function drawActions(data, theme) {
@@ -245,18 +248,14 @@ function drawActionRow(y, name, text, power, theme) {
   ctx.fillStyle = "rgba(255, 238, 246, 0.92)";
   ctx.fillRect(x, y, w, h);
 
-  ctx.beginPath();
-  ctx.arc(120, y + 65, 39, 0, Math.PI * 2);
-  ctx.fillStyle = theme.dark;
-  ctx.fill();
-  ctx.strokeStyle = "#e6c754";
-  ctx.lineWidth = 4;
-  ctx.stroke();
+  // 左アイコンにはコスト数値を表示する
+  const cost = actionCost(power);
+  drawCostIcon(120, y + 65, cost, theme);
 
   ctx.fillStyle = "#160f1d";
   ctx.textAlign = "left";
   ctx.textBaseline = "alphabetic";
-  fitText(name, 220, y + 48, 540, 38, 24);
+  fitText(name, 220, y + 46, 540, 36, 24);
 
   ctx.strokeStyle = "#2b2030";
   ctx.lineWidth = 2;
@@ -265,13 +264,15 @@ function drawActionRow(y, name, text, power, theme) {
   ctx.lineTo(812, y + 58);
   ctx.stroke();
 
+  // 技説明は2行以内。威力表示と重ならないよう右側を空ける
   ctx.fillStyle = "#1a1320";
-  ctx.font = "24px sans-serif";
-  fitText(text, 220, y + 91, 590, 24, 18);
+  ctx.font = "21px sans-serif";
+  drawWrappedText(text, 220, y + 88, 560, 26, 2);
 
   ctx.fillStyle = "#070507";
   ctx.font = "bold 58px sans-serif";
   ctx.textAlign = "right";
+  ctx.textBaseline = "alphabetic";
   ctx.fillText(String(power), 922, y + 84);
 }
 
@@ -406,6 +407,61 @@ function wrapText(text, x, y, maxWidth, lineHeight, maxLines) {
   if (lines.length < maxLines && line) lines.push(line);
 
   lines.slice(0, maxLines).forEach((l, i) => ctx.fillText(l, x, y + i * lineHeight));
+}
+
+function wrapTextLines(text, maxWidth, maxLines) {
+  const chars = Array.from(String(text || ""));
+  let line = "";
+  const lines = [];
+
+  for (const ch of chars) {
+    const testLine = line + ch;
+    if (ctx.measureText(testLine).width > maxWidth && line) {
+      lines.push(line);
+      line = ch;
+      if (lines.length >= maxLines) break;
+    } else {
+      line = testLine;
+    }
+  }
+
+  if (lines.length < maxLines && line) lines.push(line);
+
+  return lines.slice(0, maxLines);
+}
+
+function drawWrappedText(text, x, y, maxWidth, lineHeight, maxLines) {
+  const lines = wrapTextLines(text, maxWidth, maxLines);
+  lines.forEach((line, index) => ctx.fillText(line, x, y + index * lineHeight));
+}
+
+function drawCostIcon(cx, cy, cost, theme) {
+  const grad = ctx.createRadialGradient(cx - 10, cy - 12, 6, cx, cy, 42);
+  grad.addColorStop(0, theme.glow);
+  grad.addColorStop(0.45, theme.sub);
+  grad.addColorStop(1, theme.dark);
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, 39, 0, Math.PI * 2);
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  ctx.strokeStyle = "#e6c754";
+  ctx.lineWidth = 4;
+  ctx.stroke();
+
+  ctx.fillStyle = "#fff7c9";
+  ctx.font = "bold 34px sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(String(cost), cx, cy + 1);
+}
+
+function actionCost(power) {
+  if (power >= 100) return 4;
+  if (power >= 80) return 3;
+  if (power >= 60) return 2;
+  return 1;
 }
 
 function pseudoRandom(seed) {
