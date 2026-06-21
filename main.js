@@ -102,14 +102,14 @@ function normalizeCardData(data) {
     type: allowedTypes.includes(data.type) ? data.type : "闇",
     totalPower: clamp(Number(data.totalPower || 238), 150, 300),
     specialName: String(data.specialName || "特殊効果").slice(0, 10),
-    specialEffect: String(data.specialEffect || "").slice(0, 62),
+    specialEffect: String(data.specialEffect || "").slice(0, 54),
     action1Name: String(data.action1Name || "アクション").slice(0, 10),
     action1Power: clamp(Number(data.action1Power || 70), 30, 120),
-    action1Text: String(data.action1Text || "").slice(0, 40),
+    action1Text: String(data.action1Text || "").slice(0, 34),
     action2Name: String(data.action2Name || "アクション").slice(0, 10),
     action2Power: clamp(Number(data.action2Power || 70), 30, 120),
-    action2Text: String(data.action2Text || "").slice(0, 40),
-    flavorText: String(data.flavorText || "").slice(0, 54),
+    action2Text: String(data.action2Text || "").slice(0, 34),
+    flavorText: String(data.flavorText || "").slice(0, 44),
     cardNo: String(data.cardNo || "0001").replace(/\D/g, "").padStart(4, "0").slice(0, 4)
   };
 }
@@ -232,17 +232,17 @@ function drawInfoArea(data, theme) {
 }
 
 function drawActions(data, theme) {
-  drawActionRow(1036, data.action1Name, data.action1Text, data.action1Power, theme);
-  drawActionRow(1204, data.action2Name, data.action2Text, data.action2Power, theme);
+  drawActionRow(1026, data.action1Name, data.action1Text, data.action1Power, theme);
+  drawActionRow(1168, data.action2Name, data.action2Text, data.action2Power, theme);
 }
 
 function drawActionRow(y, name, text, power, theme) {
-  const x = 62, w = 900, h = 146;
+  const x = 62, w = 900, h = 126;
   ctx.fillStyle = "rgba(255, 238, 246, 0.9)";
   ctx.fillRect(x, y, w, h);
 
   ctx.beginPath();
-  ctx.arc(118, y + 73, 42, 0, Math.PI * 2);
+  ctx.arc(118, y + 63, 38, 0, Math.PI * 2);
   ctx.fillStyle = theme.main;
   ctx.fill();
   ctx.strokeStyle = "#e9d084";
@@ -252,43 +252,44 @@ function drawActionRow(y, name, text, power, theme) {
   ctx.fillStyle = "#1b1422";
   ctx.textAlign = "left";
   ctx.textBaseline = "alphabetic";
-  fitText(name, 220, y + 54, 540, 40, 26);
+  fitText(name, 220, y + 48, 540, 36, 24);
 
   ctx.strokeStyle = "#2b2030";
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(220, y + 66);
-  ctx.lineTo(810, y + 66);
+  ctx.moveTo(220, y + 58);
+  ctx.lineTo(810, y + 58);
   ctx.stroke();
 
   ctx.fillStyle = "#19121f";
-  ctx.font = "25px sans-serif";
-  wrapText(text, 220, y + 98, 560, 32, 2);
+  ctx.font = "23px sans-serif";
+  wrapText(text, 220, y + 90, 560, 28, 1);
 
   ctx.fillStyle = "#070507";
-  ctx.font = "bold 62px sans-serif";
+  ctx.font = "bold 58px sans-serif";
   ctx.textAlign = "right";
-  ctx.fillText(String(power), 920, y + 88);
+  ctx.fillText(String(power), 920, y + 78);
 }
 
 function drawFooter(data) {
-  // フッターをアクション2より下に固定し、重なりを防ぐ
-  const x = 62, y = 1360, w = 900, h = 82;
-  ctx.fillStyle = "rgba(20, 10, 32, 0.94)";
-  ctx.fillRect(x, y - h, w, h);
+  // アクション2の下に独立したフッター帯を配置
+  const x = 62, y = 1316, w = 900, h = 68;
+  ctx.fillStyle = "rgba(20, 10, 32, 0.96)";
+  ctx.fillRect(x, y, w, h);
 
   ctx.fillStyle = "#f1e9ff";
-  ctx.font = "24px sans-serif";
+  ctx.font = "23px sans-serif";
   ctx.textAlign = "left";
-  ctx.textBaseline = "alphabetic";
-  wrapText(data.flavorText, 84, y - 44, 650, 30, 2);
+  ctx.textBaseline = "middle";
+  fitText(data.flavorText, 84, y + 35, 620, 23, 18);
 
   ctx.fillStyle = "#f7e28d";
   ctx.font = "bold 28px sans-serif";
   ctx.textAlign = "right";
-  ctx.fillText(`No.${data.cardNo}`, 850, y - 22);
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText(`No.${data.cardNo}`, 850, y + 45);
   ctx.font = "42px serif";
-  ctx.fillText("☆", 930, y - 20);
+  ctx.fillText("☆", 930, y + 47);
 }
 
 function drawSparkles(x, y, w, h, theme) {
